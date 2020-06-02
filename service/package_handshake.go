@@ -1,4 +1,4 @@
-package convaipkgsdk
+package service
 
 import (
 	"github.com/google/uuid"

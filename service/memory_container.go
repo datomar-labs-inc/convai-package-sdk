@@ -1,4 +1,4 @@
-package convaipkgsdk
+package service
 
 type Mem map[string]string
 
