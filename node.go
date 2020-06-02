@@ -13,7 +13,7 @@ type NodeExecHandler func(call *NodeCall) (NodeCallResult, error)
 // NodeCall is Convai requesting that a package perform a node execution and return the result
 type NodeCall struct {
 	RequestID       uuid.UUID         `json:"request_id"` // The ID of the current request
-	ID              uuid.UUID         `json:"id"`         // The ID of the node type, used by the plugin to determine which node
+	ID              string            `json:"id"`         // The ID of the node type, used by the plugin to determine which node
 	Version         string            `json:"version"`    // Which version of this node was this config created on
 	Config          MemoryContainer   `json:"config"`     // How this specific node was configured by the bot builder
 	PackageSettings MemoryContainer   `json:"package_settings"`
@@ -46,7 +46,7 @@ type RunnableNode struct {
 	UI          UIHandler       `json:"-"`
 
 	Name          string    `json:"name"`
-	ID            uuid.UUID `json:"id"`
+	ID            string    `json:"id"`
 	Version       string    `json:"version"` // Valid semantic version
 	Style         NodeStyle `json:"style"`
 	Documentation string    `json:"documentation"` // Markdown format
@@ -115,13 +115,7 @@ func (p *RunnablePackage) HandleNodeExecuteMock(c *gin.Context) {
 func (p *RunnablePackage) HandleNodeUI(c *gin.Context) {
 	nid := c.Param("nid")
 
-	nUUID, err := uuid.Parse(nid)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO add better error response and logging
-		return
-	}
-
-	node := p.GetNode(nUUID)
+	node := p.GetNode(nid)
 
 	if node == nil {
 		c.JSON(http.StatusNotFound, gin.H{"erorr": "node not found"}) // TODO add better error response and logging

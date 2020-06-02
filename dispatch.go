@@ -17,7 +17,7 @@ type DispatchResponse struct {
 
 type DispatchCall struct {
 	RequestID       uuid.UUID       `json:"request_id"`
-	ID              uuid.UUID       `json:"id"`           // The ID of the type of dispatch being called
+	ID              string          `json:"id"`           // The ID of the type of dispatch being called
 	MessageBody     string          `json:"message_body"` // XML format message body that the package should parse, post templating
 	PackageSettings MemoryContainer `json:"package_settings"`
 	Sequence        int             `json:"sequence"` // The order of the message (the order is per request id)
@@ -37,9 +37,9 @@ type RunnableDispatch struct {
 	MockHandler DispatchHandler `json:"-"`
 	UI          UIHandler       `json:"-"`
 
-	Name          string    `json:"name"`
-	ID            uuid.UUID `json:"id"`
-	Documentation string    `json:"documentation"` // Markdown format
+	Name          string `json:"name"`
+	ID            string `json:"id"`
+	Documentation string `json:"documentation"` // Markdown format
 }
 
 func (p *RunnablePackage) HandleDispatchExecute(c *gin.Context) {

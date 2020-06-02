@@ -2,7 +2,6 @@ package convai_package_sdk
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type RunnablePackage struct {
@@ -14,6 +13,40 @@ type RunnablePackage struct {
 	Dispatches []RunnableDispatch `json:"responders"`
 	Settings   RunnableSettings   `json:"settings"`
 	Assets     AssetHandler       `json:"-"`
+}
+
+func NewPackage() *RunnablePackage {
+	return &RunnablePackage{
+		Nodes:      []RunnableNode{},
+		Links:      []RunnableLink{},
+		Events:     []PackageEvent{},
+		Dispatches: []RunnableDispatch{},
+		Settings:   RunnableSettings{},
+	}
+}
+
+func (p *RunnablePackage) AddNode(node RunnableNode) {
+	p.Nodes = append(p.Nodes, node)
+}
+
+func (p *RunnablePackage) AddLink(link RunnableLink) {
+	p.Links = append(p.Links, link)
+}
+
+func (p *RunnablePackage) AddEvent(event PackageEvent) {
+	p.Events = append(p.Events, event)
+}
+
+func (p *RunnablePackage) AddDispatch(dispatch RunnableDispatch) {
+	p.Dispatches = append(p.Dispatches, dispatch)
+}
+
+func (p *RunnablePackage) SetSettings(settings RunnableSettings) {
+	p.Settings = settings
+}
+
+func (p *RunnablePackage) SetAssets(handler AssetHandler) {
+	p.Assets = handler
 }
 
 func (p *RunnablePackage) GetRouter() *gin.Engine {
@@ -37,7 +70,7 @@ func (p *RunnablePackage) GetRouter() *gin.Engine {
 	return r
 }
 
-func (p *RunnablePackage) GetNode(id uuid.UUID) *RunnableNode {
+func (p *RunnablePackage) GetNode(id string) *RunnableNode {
 	for _, n := range p.Nodes {
 		if n.ID == id {
 			return &n
@@ -47,7 +80,7 @@ func (p *RunnablePackage) GetNode(id uuid.UUID) *RunnableNode {
 	return nil
 }
 
-func (p *RunnablePackage) GetLink(id uuid.UUID) *RunnableLink {
+func (p *RunnablePackage) GetLink(id string) *RunnableLink {
 	for _, l := range p.Links {
 		if l.ID == id {
 			return &l
@@ -57,7 +90,7 @@ func (p *RunnablePackage) GetLink(id uuid.UUID) *RunnableLink {
 	return nil
 }
 
-func (p *RunnablePackage) GetDispatch(id uuid.UUID) *RunnableDispatch {
+func (p *RunnablePackage) GetDispatch(id string) *RunnableDispatch {
 	for _, r := range p.Dispatches {
 		if r.ID == id {
 			return &r

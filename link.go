@@ -16,7 +16,7 @@ type RunnableLink struct {
 	UI          UIHandler       `json:"-"`
 
 	Name          string    `json:"name"`
-	ID            uuid.UUID `json:"id"`
+	ID            string    `json:"id"`
 	Version       string    `json:"version"` // Valid semantic version
 	Style         LinkStyle `json:"style"`
 	Documentation string    `json:"documentation"` // Markdown format
@@ -25,7 +25,7 @@ type RunnableLink struct {
 // LinkCall is Convai requesting that a package perform a link execution and return the result
 type LinkCall struct {
 	RequestID       uuid.UUID         `json:"request_id"` // The id of the current request
-	ID              uuid.UUID         `json:"id"`         // The ID of the link type, used by the plugin to determine which link should be executed
+	ID              string            `json:"id"`         // The ID of the link type, used by the plugin to determine which link should be executed
 	Version         string            `json:"version"`    // Which version of this link was this config created on
 	Config          MemoryContainer   `json:"config"`     // How this specific link was configured by the bot builder
 	PackageSettings MemoryContainer   `json:"package_settings"`
@@ -115,13 +115,7 @@ func (p *RunnablePackage) HandleLinkExecuteMock(c *gin.Context) {
 func (p *RunnablePackage) HandleLinkUI(c *gin.Context) {
 	lid := c.Param("lid")
 
-	lUUID, err := uuid.Parse(lid)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // TODO add better error response and logging
-		return
-	}
-
-	link := p.GetLink(lUUID)
+	link := p.GetLink(lid)
 
 	if link != nil {
 		c.JSON(http.StatusNotFound, gin.H{"erorr": "link not found"}) // TODO add better error response and logging
@@ -142,4 +136,3 @@ func (p *RunnablePackage) HandleLinkUI(c *gin.Context) {
 		return
 	}
 }
-

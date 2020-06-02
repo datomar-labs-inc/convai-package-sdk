@@ -5,14 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type RunnableSettings struct {
 	UI UIHandler `json:"-"`
-
-	Name string    `json:"name"`
-	ID   uuid.UUID `json:"id"`
 }
 
 func (p *RunnablePackage) HandleSettingsUI(c *gin.Context) {

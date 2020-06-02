@@ -7,9 +7,8 @@ import (
 )
 
 func TestRunnablePackage_GetNode(t *testing.T) {
-	id := uuid.Must(uuid.NewRandom())
-
-	id2 := uuid.Must(uuid.NewRandom())
+	id := uuid.Must(uuid.NewRandom()).String()
+	id2 := uuid.Must(uuid.NewRandom()).String()
 
 	node := RunnableNode{
 		Name:          "Test Node",
@@ -40,7 +39,7 @@ func TestRunnablePackage_GetNode(t *testing.T) {
 		}
 	}
 
-	randomID := uuid.Must(uuid.NewRandom())
+	randomID := uuid.Must(uuid.NewRandom()).String()
 
 	gn2 := p.GetNode(randomID)
 
@@ -50,8 +49,8 @@ func TestRunnablePackage_GetNode(t *testing.T) {
 }
 
 func TestRunnablePackage_GetLink(t *testing.T) {
-	id := uuid.Must(uuid.NewRandom())
-	id2 := uuid.Must(uuid.NewRandom())
+	id := uuid.Must(uuid.NewRandom()).String()
+	id2 := uuid.Must(uuid.NewRandom()).String()
 
 	link := RunnableLink{
 		Name:          "Test Node",
@@ -82,7 +81,7 @@ func TestRunnablePackage_GetLink(t *testing.T) {
 		}
 	}
 
-	randomID := uuid.Must(uuid.NewRandom())
+	randomID := uuid.Must(uuid.NewRandom()).String()
 
 	gl2 := p.GetLink(randomID)
 
@@ -92,8 +91,8 @@ func TestRunnablePackage_GetLink(t *testing.T) {
 }
 
 func TestRunnablePackage_GetDispatch(t *testing.T) {
-	id := uuid.Must(uuid.NewRandom())
-	id2 := uuid.Must(uuid.NewRandom())
+	id := uuid.Must(uuid.NewRandom()).String()
+	id2 := uuid.Must(uuid.NewRandom()).String()
 
 	dispatch := RunnableDispatch{
 		Name:          "Test Node",
@@ -122,7 +121,7 @@ func TestRunnablePackage_GetDispatch(t *testing.T) {
 		}
 	}
 
-	randomID := uuid.Must(uuid.NewRandom())
+	randomID := uuid.Must(uuid.NewRandom()).String()
 
 	gl2 := p.GetDispatch(randomID)
 

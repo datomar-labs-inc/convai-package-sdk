@@ -12,7 +12,7 @@ import (
 )
 
 func TestNodeExecuteRoute(t *testing.T) {
-	nodeID := uuid.Must(uuid.NewRandom())
+	nodeID := uuid.Must(uuid.NewRandom()).String()
 
 	node := RunnableNode{
 		Handler: func(call *NodeCall) (result NodeCallResult, err error) {
