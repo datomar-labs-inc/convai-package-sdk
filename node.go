@@ -1,4 +1,4 @@
-package service
+package convai_package_sdk
 
 import (
 	"fmt"

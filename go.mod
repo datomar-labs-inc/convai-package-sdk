@@ -1,4 +1,4 @@
-module github.com/datomar-labs-inc/convai-package-sdk/service
+module github.com/datomar-labs-inc/convai-package-sdk
 
 go 1.13
 

@@ -1,4 +1,4 @@
-package service
+package convai_package_sdk
 
 const (
 	OpSet = iota
