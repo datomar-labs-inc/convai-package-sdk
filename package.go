@@ -5,11 +5,11 @@ import (
 )
 
 type RunnablePackage struct {
-	router *gin.Engine
+	router *gin.Engine `json:"-"`
 
 	Nodes      []RunnableNode     `json:"nodes"`
 	Links      []RunnableLink     `json:"links"`
-	Events     []PackageEvent     `json:"events"`
+	Events     []RunnableEvent    `json:"events"`
 	Dispatches []RunnableDispatch `json:"responders"`
 	Settings   RunnableSettings   `json:"settings"`
 	Assets     AssetHandler       `json:"-"`
@@ -19,7 +19,7 @@ func NewPackage() *RunnablePackage {
 	return &RunnablePackage{
 		Nodes:      []RunnableNode{},
 		Links:      []RunnableLink{},
-		Events:     []PackageEvent{},
+		Events:     []RunnableEvent{},
 		Dispatches: []RunnableDispatch{},
 		Settings:   RunnableSettings{},
 	}
@@ -33,7 +33,7 @@ func (p *RunnablePackage) AddLink(link RunnableLink) {
 	p.Links = append(p.Links, link)
 }
 
-func (p *RunnablePackage) AddEvent(event PackageEvent) {
+func (p *RunnablePackage) AddEvent(event RunnableEvent) {
 	p.Events = append(p.Events, event)
 }
 
@@ -66,6 +66,8 @@ func (p *RunnablePackage) GetRouter() *gin.Engine {
 	r.GET("/settings/ui", p.HandleSettingsUI)
 
 	r.GET("/assets/:filename", p.HandleAssetRequest)
+
+	r.GET("/manifest", p.HManifest)
 
 	return r
 }
