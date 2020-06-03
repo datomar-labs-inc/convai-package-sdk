@@ -1,6 +1,9 @@
 package convai_package_sdk
 
 import (
+	"time"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,6 +54,13 @@ func (p *RunnablePackage) SetAssets(handler AssetHandler) {
 
 func (p *RunnablePackage) GetRouter() *gin.Engine {
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 
 	r.POST("/nodes/execute", p.HandleNodeExecute)
 	r.POST("/nodes/execute-mock", p.HandleNodeExecuteMock)
