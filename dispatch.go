@@ -35,7 +35,6 @@ type DispatchHandler func(call *DispatchCall) (DispatchCallResult, error)
 type RunnableDispatch struct {
 	Handler     DispatchHandler `json:"-"`
 	MockHandler DispatchHandler `json:"-"`
-	UI          UIHandler       `json:"-"`
 
 	Name          string `json:"name"`
 	ID            string `json:"id"`
