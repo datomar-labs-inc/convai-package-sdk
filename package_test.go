@@ -3,6 +3,7 @@ package convai_package_sdk
 import (
 	"testing"
 
+	ctypes "github.com/datomar-labs-inc/convai-types"
 	"github.com/google/uuid"
 )
 
@@ -11,17 +12,20 @@ func TestRunnablePackage_GetNode(t *testing.T) {
 	id2 := uuid.Must(uuid.NewRandom()).String()
 
 	node := RunnableNode{
-		Name:          "Test Node",
-		ID:            id,
-		Version:       "0.1.0",
+		PackageNode: ctypes.PackageNode{
+			Name:    "Test Node",
+			ID:      id,
+			Version: "0.1.0",
+		},
 	}
 
 	node2 := RunnableNode{
-		Name:          "Test Node",
-		ID:            id2,
-		Version:       "0.1.0",
+		PackageNode: ctypes.PackageNode{
+			Name:    "Test Node",
+			ID:      id2,
+			Version: "0.1.0",
+		},
 	}
-
 
 	p := RunnablePackage{
 		Nodes: []RunnableNode{node, node2},
@@ -53,17 +57,20 @@ func TestRunnablePackage_GetLink(t *testing.T) {
 	id2 := uuid.Must(uuid.NewRandom()).String()
 
 	link := RunnableLink{
-		Name:          "Test Node",
-		ID:            id,
-		Version:       "0.1.0",
+		PackageLink: ctypes.PackageLink{
+			Name:    "Test Node",
+			ID:      id,
+			Version: "0.1.0",
+		},
 	}
 
 	link2 := RunnableLink{
-		Name:          "Test Node",
-		ID:            id2,
-		Version:       "0.1.0",
+		PackageLink: ctypes.PackageLink{
+			Name:    "Test Node",
+			ID:      id2,
+			Version: "0.1.0",
+		},
 	}
-
 
 	p := RunnablePackage{
 		Links: []RunnableLink{link, link2},
@@ -95,15 +102,18 @@ func TestRunnablePackage_GetDispatch(t *testing.T) {
 	id2 := uuid.Must(uuid.NewRandom()).String()
 
 	dispatch := RunnableDispatch{
-		Name:          "Test Node",
-		ID:            id,
+		PackageDispatch: ctypes.PackageDispatch{
+			Name: "Test Node",
+			ID:   id,
+		},
 	}
 
 	dispatch2 := RunnableDispatch{
-		Name:          "Test Node",
-		ID:            id2,
+		PackageDispatch: ctypes.PackageDispatch{
+			Name: "Test Node",
+			ID:   id2,
+		},
 	}
-
 
 	p := RunnablePackage{
 		Dispatches: []RunnableDispatch{dispatch, dispatch2},
@@ -129,5 +139,3 @@ func TestRunnablePackage_GetDispatch(t *testing.T) {
 		t.Error("expected nil dispatch returned but got dispatch instead")
 	}
 }
-
-

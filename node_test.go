@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	ctypes "github.com/datomar-labs-inc/convai-types"
 	"github.com/google/uuid"
 )
 
@@ -15,16 +16,19 @@ func TestNodeExecuteRoute(t *testing.T) {
 	nodeID := uuid.Must(uuid.NewRandom()).String()
 
 	node := RunnableNode{
-		Handler: func(call *NodeCall) (result NodeCallResult, err error) {
-			ncr := NodeCallResult{
+		Handler: func(call *ctypes.NodeCall) (result ctypes.NodeCallResult, err error) {
+			ncr := ctypes.NodeCallResult{
 				RequestID: call.RequestID,
 			}
 
 			return ncr, nil
 		},
-		Name:    "TestNode",
-		ID:      nodeID,
-		Version: "0.1.0",
+
+		PackageNode: ctypes.PackageNode{
+			Name:    "TestNode",
+			ID:      nodeID,
+			Version: "0.1.0",
+		},
 	}
 
 	p := RunnablePackage{
@@ -37,8 +41,8 @@ func TestNodeExecuteRoute(t *testing.T) {
 	reqID := uuid.Must(uuid.NewRandom())
 
 	req, err := http.NewRequest("POST", "/nodes/execute", bytes.NewReader(mustJSONify(
-		NodeExecutionRequest{
-			Calls: []NodeCall{
+		ctypes.NodeExecutionRequest{
+			Calls: []ctypes.NodeCall{
 				{
 					RequestID: reqID,
 					ID:        nodeID,
@@ -58,8 +62,8 @@ func TestNodeExecuteRoute(t *testing.T) {
 		t.Error(fmt.Sprintf("expected status code 200, got %d", w.Code))
 	}
 
-	expectedBody := mustJSONify(NodeExecutionResponse{
-		[]NodeCallResult{
+	expectedBody := mustJSONify(ctypes.NodeExecutionResponse{
+		[]ctypes.NodeCallResult{
 			{
 				RequestID: reqID,
 			},
