@@ -68,16 +68,17 @@ func (p *RunnablePackage) GetRouter(signingKey string) *gin.Engine {
 	r.GET("/links/:lid/ui", p.HandleLinkUI)
 	r.GET("/nodes/:nid/ui", p.HandleNodeUI)
 
-	r.Use(signatureVerificationMiddleware(signingKey))
+	authG := r.Group("")
+	authG.Use(signatureVerificationMiddleware(signingKey))
 
-	r.POST("/nodes/execute", p.HandleNodeExecute)
-	r.POST("/nodes/execute-mock", p.HandleNodeExecuteMock)
+	authG.POST("/nodes/execute", p.HandleNodeExecute)
+	authG.POST("/nodes/execute-mock", p.HandleNodeExecuteMock)
 
-	r.POST("/links/execute", p.HandleLinkExecute)
-	r.POST("/links/execute-mock", p.HandleLinkExecuteMock)
+	authG.POST("/links/execute", p.HandleLinkExecute)
+	authG.POST("/links/execute-mock", p.HandleLinkExecuteMock)
 
-	r.POST("/dispatch/execute", p.HandleDispatchExecute)
-	r.POST("/dispatch/execute-mock", p.HandleDispatchExecuteMock)
+	authG.POST("/dispatch/execute", p.HandleDispatchExecute)
+	authG.POST("/dispatch/execute-mock", p.HandleDispatchExecuteMock)
 
 	return r
 }

@@ -83,7 +83,7 @@ func (p *RunnablePackage) HandleLinkUI(c *gin.Context) {
 
 	link := p.GetLink(lid)
 
-	if link != nil {
+	if link == nil {
 		c.JSON(http.StatusNotFound, gin.H{"erorr": "link not found"}) // TODO add better error response and logging
 		return
 	}
