@@ -52,7 +52,7 @@ func (p *RunnablePackage) SetAssets(handler AssetHandler) {
 	p.Assets = handler
 }
 
-func (p *RunnablePackage) GetRouter() *gin.Engine {
+func (p *RunnablePackage) GetRouter(signingKey string) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -62,22 +62,22 @@ func (p *RunnablePackage) GetRouter() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	r.GET("/manifest", p.HManifest)
+	r.GET("/assets/:filename", p.HandleAssetRequest)
+	r.GET("/settings/ui", p.HandleSettingsUI)
+	r.GET("/links/:lid/ui", p.HandleLinkUI)
+	r.GET("/nodes/:nid/ui", p.HandleNodeUI)
+
+	r.Use(signatureVerificationMiddleware(signingKey))
+
 	r.POST("/nodes/execute", p.HandleNodeExecute)
 	r.POST("/nodes/execute-mock", p.HandleNodeExecuteMock)
-	r.GET("/nodes/:nid/ui", p.HandleNodeUI)
 
 	r.POST("/links/execute", p.HandleLinkExecute)
 	r.POST("/links/execute-mock", p.HandleLinkExecuteMock)
-	r.GET("/links/:lid/ui", p.HandleLinkUI)
 
 	r.POST("/dispatch/execute", p.HandleDispatchExecute)
 	r.POST("/dispatch/execute-mock", p.HandleDispatchExecuteMock)
-
-	r.GET("/settings/ui", p.HandleSettingsUI)
-
-	r.GET("/assets/:filename", p.HandleAssetRequest)
-
-	r.GET("/manifest", p.HManifest)
 
 	return r
 }
