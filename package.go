@@ -1,14 +1,18 @@
 package convai_package_sdk
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
+type HealthCheck func() error
+
 type RunnablePackage struct {
-	router *gin.Engine `json:"-"`
+	router      *gin.Engine `json:"-"`
+	healthCheck HealthCheck `json:"-"`
 
 	Nodes      []RunnableNode     `json:"nodes"`
 	Links      []RunnableLink     `json:"links"`
@@ -26,6 +30,10 @@ func NewPackage() *RunnablePackage {
 		Dispatches: []RunnableDispatch{},
 		Settings:   RunnableSettings{},
 	}
+}
+
+func (p *RunnablePackage) SetHealthCheck(handler HealthCheck) {
+	p.healthCheck = handler
 }
 
 func (p *RunnablePackage) AddNode(node RunnableNode) {
@@ -67,6 +75,8 @@ func (p *RunnablePackage) GetRouter(signingKey string) *gin.Engine {
 	r.GET("/settings/ui", p.HandleSettingsUI)
 	r.GET("/links/:lid/ui", p.HandleLinkUI)
 	r.GET("/nodes/:nid/ui", p.HandleNodeUI)
+
+	r.GET("/healthz", p.HHealth)
 
 	authG := r.Group("")
 	authG.Use(signatureVerificationMiddleware(signingKey))
@@ -111,4 +121,18 @@ func (p *RunnablePackage) GetDispatch(id string) *RunnableDispatch {
 	}
 
 	return nil
+}
+
+func (p *RunnablePackage) HHealth(c *gin.Context) {
+	if p.healthCheck != nil {
+		err := p.healthCheck()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"status": "healthy"})
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "health check not defined"})
+	}
 }
