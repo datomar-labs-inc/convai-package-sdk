@@ -23,7 +23,7 @@ func (p *RunnablePackage) HandleDispatchExecute(c *gin.Context) {
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
 		respErr := ctypes.Error{
-			Code:    400,
+			Code:    ctypes.ErrDispatchUnmarshal,
 			Message: "bad json request format",
 		}
 		c.JSON(http.StatusBadRequest, respErr) // TODO: better error messages and logging
@@ -40,7 +40,7 @@ func (p *RunnablePackage) HandleDispatchExecute(c *gin.Context) {
 			errResp := ctypes.DispatchCallResult{
 				Successful: false,
 				Error: &ctypes.Error{
-					Code:    400,
+					Code:    ctypes.ErrDispatchNotFound,
 					Message: "dispatch missing",
 				},
 			}
@@ -55,7 +55,7 @@ func (p *RunnablePackage) HandleDispatchExecute(c *gin.Context) {
 			errResp := ctypes.DispatchCallResult{
 				Successful: false,
 				Error: &ctypes.Error{
-					Code:    500,
+					Code:    ctypes.ErrHandlerFailure,
 					Message: fmt.Sprintf("handler failed: %s", err.Error()),
 				},
 			}

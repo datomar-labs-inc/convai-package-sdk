@@ -9,3 +9,5 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/markbates/pkger v0.16.0
 )
+
+replace github.com/datomar-labs-inc/convai-types => D:\Projects\convai-types
