@@ -26,7 +26,7 @@ func TestNodeExecuteRoute(t *testing.T) {
 
 		PackageNode: ctypes.PackageNode{
 			Name:    "TestNode",
-			ID:      nodeID,
+			TypeID:  nodeID,
 			Version: "0.1.0",
 		},
 	}
@@ -45,7 +45,7 @@ func TestNodeExecuteRoute(t *testing.T) {
 			Calls: []ctypes.NodeCall{
 				{
 					RequestID: reqID,
-					ID:        nodeID,
+					TypeID:    nodeID,
 					Version:   "0.1.0",
 				},
 			},
@@ -55,7 +55,7 @@ func TestNodeExecuteRoute(t *testing.T) {
 		return
 	}
 
-	r := p.GetRouter()
+	r := p.GetRouter("bubbles")
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {

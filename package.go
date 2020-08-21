@@ -11,8 +11,8 @@ import (
 type HealthCheck func() error
 
 type RunnablePackage struct {
-	router      *gin.Engine `json:"-"`
-	healthCheck HealthCheck `json:"-"`
+	router      *gin.Engine
+	healthCheck HealthCheck
 
 	Nodes      []RunnableNode     `json:"nodes"`
 	Links      []RunnableLink     `json:"links"`
