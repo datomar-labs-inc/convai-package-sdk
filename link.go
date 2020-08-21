@@ -30,7 +30,7 @@ func (p *RunnablePackage) HandleLinkExecute(c *gin.Context) {
 	results := ctypes.LinkExecutionResponse{[]ctypes.LinkCallResult{}}
 
 	for _, call := range input.Calls {
-		l := p.GetLink(call.ID)
+		l := p.GetLink(call.TypeID)
 
 		if l == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "link missing"}) // TODO: better error messages and logging
@@ -60,7 +60,7 @@ func (p *RunnablePackage) HandleLinkExecuteMock(c *gin.Context) {
 	results := ctypes.LinkExecutionResponse{[]ctypes.LinkCallResult{}}
 
 	for _, call := range input.Calls {
-		l := p.GetLink(call.ID)
+		l := p.GetLink(call.TypeID)
 
 		if l == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "link missing"}) // TODO: better error messages and logging

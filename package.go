@@ -95,7 +95,7 @@ func (p *RunnablePackage) GetRouter(signingKey string) *gin.Engine {
 
 func (p *RunnablePackage) GetNode(id string) *RunnableNode {
 	for _, n := range p.Nodes {
-		if n.ID == id {
+		if n.TypeID == id {
 			return &n
 		}
 	}
@@ -105,7 +105,7 @@ func (p *RunnablePackage) GetNode(id string) *RunnableNode {
 
 func (p *RunnablePackage) GetLink(id string) *RunnableLink {
 	for _, l := range p.Links {
-		if l.ID == id {
+		if l.TypeID == id {
 			return &l
 		}
 	}

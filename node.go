@@ -33,7 +33,7 @@ func (p *RunnablePackage) HandleNodeExecute(c *gin.Context) {
 	results := ctypes.NodeExecutionResponse{[]ctypes.NodeCallResult{}}
 
 	for _, call := range input.Calls {
-		n := p.GetNode(call.ID)
+		n := p.GetNode(call.TypeID)
 
 		if n == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "node missing"}) // TODO: better error messages and logging
@@ -63,7 +63,7 @@ func (p *RunnablePackage) HandleNodeExecuteMock(c *gin.Context) {
 	results := ctypes.NodeExecutionResponse{[]ctypes.NodeCallResult{}}
 
 	for _, call := range input.Calls {
-		n := p.GetNode(call.ID)
+		n := p.GetNode(call.TypeID)
 
 		if n == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "node missing"}) // TODO: better error messages and logging

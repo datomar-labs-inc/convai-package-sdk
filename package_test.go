@@ -14,7 +14,7 @@ func TestRunnablePackage_GetNode(t *testing.T) {
 	node := RunnableNode{
 		PackageNode: ctypes.PackageNode{
 			Name:    "Test Node",
-			ID:      id,
+			TypeID:      id,
 			Version: "0.1.0",
 		},
 	}
@@ -22,7 +22,7 @@ func TestRunnablePackage_GetNode(t *testing.T) {
 	node2 := RunnableNode{
 		PackageNode: ctypes.PackageNode{
 			Name:    "Test Node",
-			ID:      id2,
+			TypeID:      id2,
 			Version: "0.1.0",
 		},
 	}
@@ -38,7 +38,7 @@ func TestRunnablePackage_GetNode(t *testing.T) {
 	} else {
 		ndr := *gn
 
-		if ndr.ID != gn.ID {
+		if ndr.TypeID != gn.TypeID {
 			t.Error("incorrect node was returned")
 		}
 	}
@@ -59,7 +59,7 @@ func TestRunnablePackage_GetLink(t *testing.T) {
 	link := RunnableLink{
 		PackageLink: ctypes.PackageLink{
 			Name:    "Test Node",
-			ID:      id,
+			TypeID:      id,
 			Version: "0.1.0",
 		},
 	}
@@ -67,7 +67,7 @@ func TestRunnablePackage_GetLink(t *testing.T) {
 	link2 := RunnableLink{
 		PackageLink: ctypes.PackageLink{
 			Name:    "Test Node",
-			ID:      id2,
+			TypeID:      id2,
 			Version: "0.1.0",
 		},
 	}
@@ -83,7 +83,7 @@ func TestRunnablePackage_GetLink(t *testing.T) {
 	} else {
 		ndr := *gl
 
-		if ndr.ID != gl.ID {
+		if ndr.TypeID != gl.TypeID {
 			t.Error("incorrect link was returned")
 		}
 	}
