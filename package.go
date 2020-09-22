@@ -1,25 +1,178 @@
 package convai_package_sdk
 
 import (
-	"net/http"
-	"time"
+	"errors"
+	"fmt"
+	"io"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+	ctypes "github.com/datomar-labs-inc/convai-types"
 )
 
-type HealthCheck func() error
-
 type RunnablePackage struct {
-	router      *gin.Engine
-	healthCheck HealthCheck
-
 	Nodes      []RunnableNode     `json:"nodes"`
 	Links      []RunnableLink     `json:"links"`
 	Events     []RunnableEvent    `json:"events"`
 	Dispatches []RunnableDispatch `json:"responders"`
-	Settings   RunnableSettings   `json:"settings"`
-	Assets     AssetHandler       `json:"-"`
+	assets     AssetHandler
+}
+
+// AssetHandler should take a filename and return a reader for the file, and the mime type
+type AssetHandler func(filename string) (io.ReadCloser, string, error)
+
+func (p *RunnablePackage) GetManifest() *ctypes.Package {
+	panic("implement me")
+}
+
+func (p *RunnablePackage) ExecuteNode(input *ctypes.NodeCall) (*ctypes.NodeCallResult, error) {
+	node := p.GetNode(input.TypeID)
+
+	if node == nil {
+		return nil, errors.New("node did not exist")
+	}
+
+	result, err := node.Handler(input)
+	return &result, err
+}
+
+func (p *RunnablePackage) ExecuteNodeMock(input *ctypes.NodeCall) (*ctypes.NodeCallResult, error) {
+	node := p.GetNode(input.TypeID)
+
+	if node == nil {
+		return nil, errors.New("node did not exist")
+	}
+
+	result, err := node.MockHandler(input)
+	return &result, err
+}
+
+func (p *RunnablePackage) ExecuteLink(request *ctypes.LinkExecutionRequest) (*ctypes.LinkExecutionResponse, error) {
+	results := ctypes.LinkExecutionResponse{[]ctypes.LinkCallResult{}}
+
+	for _, call := range request.Calls {
+		l := p.GetLink(call.TypeID)
+
+		if l == nil {
+			return nil, errors.New("link did not exist")
+		}
+
+		result, err := l.Handler(&call)
+		if err != nil {
+			fmt.Println("Error was errored")
+			// TODO handle this appropriately
+		}
+
+		results.Results = append(results.Results, result)
+	}
+
+	return &results, nil
+}
+
+func (p *RunnablePackage) ExecuteLinkMock(request *ctypes.LinkExecutionRequest) (*ctypes.LinkExecutionResponse, error) {
+	results := ctypes.LinkExecutionResponse{[]ctypes.LinkCallResult{}}
+
+	for _, call := range request.Calls {
+		l := p.GetLink(call.TypeID)
+
+		if l == nil {
+			return nil, errors.New("link did not exist")
+		}
+
+		result, err := l.MockHandler(&call)
+		if err != nil {
+			fmt.Println("Error was errored")
+			// TODO handle this appropriately
+		}
+
+		results.Results = append(results.Results, result)
+	}
+
+	return &results, nil
+}
+
+func (p *RunnablePackage) Dispatch(request *ctypes.DispatchRequest) (*ctypes.DispatchResponse, error) {
+	results := ctypes.DispatchResponse{[]ctypes.DispatchCallResult{}}
+
+	for _, call := range request.Dispatches {
+		d := p.GetDispatch(call.ID)
+
+		// No dispatch, stop and let convai know
+		if d == nil {
+			errResp := ctypes.DispatchCallResult{
+				Successful: false,
+				Error: &ctypes.Error{
+					Code:    ctypes.ErrDispatchNotFound,
+					Message: "dispatch missing",
+				},
+			}
+
+			results.Results = append(results.Results, errResp)
+			continue
+		}
+
+		// TODO determine level of error exposure
+		// Handler didn't function
+		result, err := d.Handler(&call)
+		if err != nil {
+			errResp := ctypes.DispatchCallResult{
+				Successful: false,
+				Error: &ctypes.Error{
+					Code:    ctypes.ErrHandlerFailure,
+					Message: fmt.Sprintf("handler failed: %s", err.Error()),
+				},
+			}
+			results.Results = append(results.Results, errResp)
+			continue
+		}
+
+		results.Results = append(results.Results, result)
+	}
+
+	return &results, nil
+}
+
+func (p *RunnablePackage) DispatchMock(request *ctypes.DispatchRequest) (*ctypes.DispatchResponse, error) {
+	results := ctypes.DispatchResponse{[]ctypes.DispatchCallResult{}}
+
+	for _, call := range request.Dispatches {
+		d := p.GetDispatch(call.ID)
+
+		// No dispatch, stop and let convai know
+		if d == nil {
+			errResp := ctypes.DispatchCallResult{
+				Successful: false,
+				Error: &ctypes.Error{
+					Code:    ctypes.ErrDispatchNotFound,
+					Message: "dispatch missing",
+				},
+			}
+
+			results.Results = append(results.Results, errResp)
+			continue
+		}
+
+		// TODO determine level of error exposure
+		// Handler didn't function
+		result, err := d.MockHandler(&call)
+		if err != nil {
+			errResp := ctypes.DispatchCallResult{
+				Successful: false,
+				Error: &ctypes.Error{
+					Code:    ctypes.ErrHandlerFailure,
+					Message: fmt.Sprintf("handler failed: %s", err.Error()),
+				},
+			}
+			results.Results = append(results.Results, errResp)
+			continue
+		}
+
+		results.Results = append(results.Results, result)
+	}
+
+	return &results, nil
+}
+
+func (p *RunnablePackage) GetAsset(filename string) (io.ReadCloser, string, error) {
+	return p.assets(filename)
 }
 
 func NewPackage() *RunnablePackage {
@@ -28,12 +181,7 @@ func NewPackage() *RunnablePackage {
 		Links:      []RunnableLink{},
 		Events:     []RunnableEvent{},
 		Dispatches: []RunnableDispatch{},
-		Settings:   RunnableSettings{},
 	}
-}
-
-func (p *RunnablePackage) SetHealthCheck(handler HealthCheck) {
-	p.healthCheck = handler
 }
 
 func (p *RunnablePackage) AddNode(node RunnableNode) {
@@ -52,45 +200,8 @@ func (p *RunnablePackage) AddDispatch(dispatch RunnableDispatch) {
 	p.Dispatches = append(p.Dispatches, dispatch)
 }
 
-func (p *RunnablePackage) SetSettings(settings RunnableSettings) {
-	p.Settings = settings
-}
-
-func (p *RunnablePackage) SetAssets(handler AssetHandler) {
-	p.Assets = handler
-}
-
-func (p *RunnablePackage) GetRouter(signingKey string) *gin.Engine {
-	r := gin.Default()
-
-	r.Use(cors.New(cors.Config{
-		AllowOriginFunc: func(origin string) bool {
-			return true
-		},
-		MaxAge: 12 * time.Hour,
-	}))
-
-	r.GET("/manifest", p.HManifest)
-	r.GET("/assets/:filename", p.HandleAssetRequest)
-	r.GET("/settings/ui", p.HandleSettingsUI)
-	r.GET("/links/:lid/ui", p.HandleLinkUI)
-	r.GET("/nodes/:nid/ui", p.HandleNodeUI)
-
-	r.GET("/healthz", p.HHealth)
-
-	authG := r.Group("")
-	authG.Use(signatureVerificationMiddleware(signingKey))
-
-	authG.POST("/nodes/execute", p.HandleNodeExecute)
-	authG.POST("/nodes/execute-mock", p.HandleNodeExecuteMock)
-
-	authG.POST("/links/execute", p.HandleLinkExecute)
-	authG.POST("/links/execute-mock", p.HandleLinkExecuteMock)
-
-	authG.POST("/dispatch/execute", p.HandleDispatchExecute)
-	authG.POST("/dispatch/execute-mock", p.HandleDispatchExecuteMock)
-
-	return r
+func (p *RunnablePackage) SetAssetHandler(handler AssetHandler) {
+	p.assets = handler
 }
 
 func (p *RunnablePackage) GetNode(id string) *RunnableNode {
@@ -121,18 +232,4 @@ func (p *RunnablePackage) GetDispatch(id string) *RunnableDispatch {
 	}
 
 	return nil
-}
-
-func (p *RunnablePackage) HHealth(c *gin.Context) {
-	if p.healthCheck != nil {
-		err := p.healthCheck()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"status": "healthy"})
-	} else {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "health check not defined"})
-	}
 }
