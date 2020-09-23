@@ -11,4 +11,5 @@ type RunnableLink struct {
 
 	Handler     LinkExecHandler `json:"-"`
 	MockHandler LinkExecHandler `json:"-"`
+	UIHandler   LinkUIHandler   `json:"-"`
 }

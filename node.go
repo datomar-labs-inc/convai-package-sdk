@@ -14,5 +14,5 @@ type RunnableNode struct {
 
 	Handler     NodeExecHandler `json:"-"`
 	MockHandler NodeExecHandler `json:"-"`
+	UIHandler   NodeUIHandler   `json:"-"`
 }
-

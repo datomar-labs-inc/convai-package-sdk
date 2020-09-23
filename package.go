@@ -13,7 +13,33 @@ type RunnablePackage struct {
 	Links      []RunnableLink     `json:"links"`
 	Events     []RunnableEvent    `json:"events"`
 	Dispatches []RunnableDispatch `json:"responders"`
+
+	settingsUI SettingsUIHandler
 	assets     AssetHandler
+}
+
+func (p *RunnablePackage) GetNodeUI(typeID, version string) (io.ReadCloser, error) {
+	node := p.GetNode(typeID)
+
+	if node == nil {
+		return nil, errors.New("node did not exist")
+	}
+
+	return node.UIHandler(node)
+}
+
+func (p *RunnablePackage) GetLinkUI(typeID, version string) (io.ReadCloser, error) {
+	link := p.GetLink(typeID)
+
+	if link == nil {
+		return nil, errors.New("link did not exist")
+	}
+
+	return link.UIHandler(link)
+}
+
+func (p *RunnablePackage) GetSettingsUI() (io.ReadCloser, error) {
+	return p.settingsUI(p)
 }
 
 // AssetHandler should take a filename and return a reader for the file, and the mime type
@@ -202,6 +228,10 @@ func (p *RunnablePackage) AddDispatch(dispatch RunnableDispatch) {
 
 func (p *RunnablePackage) SetAssetHandler(handler AssetHandler) {
 	p.assets = handler
+}
+
+func (p *RunnablePackage) SetSettingsUIHandler(handler SettingsUIHandler) {
+	p.settingsUI = handler
 }
 
 func (p *RunnablePackage) GetNode(id string) *RunnableNode {
