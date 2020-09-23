@@ -14,8 +14,15 @@ type RunnablePackage struct {
 	Events     []RunnableEvent    `json:"events"`
 	Dispatches []RunnableDispatch `json:"responders"`
 
+	misc       MiscRequestHandler
 	settingsUI SettingsUIHandler
 	assets     AssetHandler
+}
+
+type MiscRequestHandler func(key string, jsonBody []byte) (interface{}, error)
+
+func (p *RunnablePackage) MiscRequest(key string, jsonBody []byte) (interface{}, error) {
+	return p.misc(key, jsonBody)
 }
 
 func (p *RunnablePackage) GetNodeUI(typeID, version string) (io.ReadCloser, error) {
@@ -232,6 +239,10 @@ func (p *RunnablePackage) SetAssetHandler(handler AssetHandler) {
 
 func (p *RunnablePackage) SetSettingsUIHandler(handler SettingsUIHandler) {
 	p.settingsUI = handler
+}
+
+func (p *RunnablePackage) SetMiscRequestHandler(handler MiscRequestHandler) {
+	p.misc = handler
 }
 
 func (p *RunnablePackage) GetNode(id string) *RunnableNode {
